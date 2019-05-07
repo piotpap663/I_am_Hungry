@@ -3,7 +3,6 @@ const path = require('path');
 const express = require('express');
 const publicPath = path.join(__dirname, '..', 'public');
 const mongoose = require('mongoose');
-//let dbURL = 'mongodb://admin:iamhungry1@ds125392.mlab.com:25392/iamhungrydb';
 const User = require('./Models/User');
 const cors = require('cors');
 const app = express();
@@ -48,7 +47,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-mongoose.connect((dbURL = 'mongodb://localhost:27017'), function(err) {
+mongoose.connect((dbURL = 'mongodb://localhost:27017'), function (err) {
   if (err) {
     console.log('Error connecting to: ' + dbURL);
   } else {
@@ -62,11 +61,11 @@ app.use(session({ secret: 'anything' }));
 var LocalStrategy = require('passport-local').Strategy;
 app.use(passport.initialize());
 app.use(passport.session());
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
   done(null, user);
 });
 
-passport.deserializeUser(function(user, done) {
+passport.deserializeUser(function (user, done) {
   done(null, user);
 });
 passport.use(
@@ -76,7 +75,7 @@ passport.use(
       passwordField: 'password',
       passReqToCallback: true
     },
-    function(req, user, password, done) {
+    function (req, user, password, done) {
       User.findOne({ user }, (err, user) => {
         if (err) {
           return done(err);
@@ -94,9 +93,6 @@ passport.use(
   )
 );
 // Use the GoogleStrategy within Passport.
-//   Strategies in Passport require a `verify` function, which accept
-//   credentials (in this case, an accessToken, refreshToken, and Google
-//   profile), and invoke a callback with a user object.
 passport.use(
   new GoogleStrategy(
     {
@@ -104,13 +100,13 @@ passport.use(
       clientSecret: GOOGLE_CLIENT_SECRET,
       callbackURL: 'http://localhost:3000/auth/google/callback'
     },
-    function(accessToken, refreshToken, profile, done) {
+    function (accessToken, refreshToken, profile, done) {
       //check user table for anyone with a facebook ID of profile.id
       User.findOne(
         {
           'google.id': profile.id
         },
-        function(err, user) {
+        function (err, user) {
           if (err) {
             console.log('error');
             return done(err);
@@ -127,7 +123,7 @@ passport.use(
               token: accessToken,
               permission: 'USER'
             });
-            user.save(function(err) {
+            user.save(function (err) {
               if (err) console.log(err);
               return done(err, user);
             });
@@ -140,7 +136,7 @@ passport.use(
     }
   )
 );
-
+// If user want to go back we save previous URI
 app.get('*', saveRedirectTo);
 
 app.get(
@@ -154,14 +150,10 @@ app.get(
 );
 
 // GET /auth/google/callback
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
 app.get(
   '/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
-  function(req, res) {
+  function (req, res) {
     console.log('authorizerd user ', req.user);
     res.redirect('http://localhost:8080/checkIfUserIsLoggedIn');
     global.user = req.user;
@@ -175,16 +167,20 @@ function saveRedirectTo(req, res, next) {
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
+db.once('open', function () {
   console.log("we're connected!");
 });
 
+// input: none
 app.get('/api/checkIfUserIsLoggedIn', checkIfUserIsLoggedIn);
 
-// app.use(cors());
-// app.options('*', cors());
+// input: user, password permission
 app.post(ENDPOINT_ADD_USER, addUser);
+
+// input: name, owners
 app.post(ENDPOINT_ADD_RESTAURANT, addRestaurant);
+
+// input: _id, order
 app.post(`${ENPOINT_ADD_ORDER}/:id`, addOrder);
 
 app.use(express.static(publicPath));
@@ -192,15 +188,38 @@ app.use(express.static(publicPath));
 app.get(ENPOINT_LOGOUT, logout);
 app.post(ENPOINT_LOGIN, login);
 
+// input: params: ID
+// output: Restaurant
 app.get(`${ENDPOINT_RESTAURANT_LIST}/:id`, getRestaurantById);
+
+// input: query: postalCode
+// output: Restaurant[]
 app.get(`${ENDPOINT_RESTAURANT_LIST}`, getRestaurants);
+
+// input: id
+// output: Restaurants[]
 app.post(ENDPOINT_GET_RESTAURANT_BY_USER_ID, getRestaurantByUserId);
+
+// input: Restaurant schema properties
 app.patch(`${ENDPOINT_RESTAURANT_LIST}/:id`, patchRestaurantById);
+
+// input: userId
+// output: orders[]
 app.post(ENDPOINT_GET_USER_ORDERS, getUserOrders);
+
+// input: userId
+// output: orders[]
 app.post(ENDPOINT_GET_RESTAURANT_ORDERS, getRestaurantOrders);
+
+// input: opinion object
+// {
+//   stars,
+//   idOrder,
+//   message
+// }
 app.post(ENDPOINT_ADD_OPINION, addOpinion);
 
-// DO ZROBIENIA
+// TODO
 app.get(ENDPOINT_GET_USERS, async (req, res, next) => {
   let result = await User.find({});
   res.send(result);
