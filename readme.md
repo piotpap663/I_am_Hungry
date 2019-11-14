@@ -7,7 +7,9 @@ Add Google Map API key in
 and
 `public/index.html`
 
+
 add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
+
 in `server/.env`
 
 # 1. Run MongoDB database
