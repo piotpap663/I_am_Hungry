@@ -2,8 +2,9 @@
 # I_am_Hungry
 
 Add Google Map API key in
-`src/components/GetDataFromGoogleAPI.js` and
 
+`src/components/GetDataFromGoogleAPI.js`
+and
 `public/index.html`
 
 add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
