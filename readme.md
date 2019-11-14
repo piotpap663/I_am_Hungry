@@ -1,7 +1,7 @@
 
 # I_am_Hungry
 
-Add Google Map API key in
+1. Add Google Map API key in
 
 `src/components/GetDataFromGoogleAPI.js`
 and
@@ -11,15 +11,15 @@ and
 
 
 
-add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
+2. add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
 
 in `server/.env`
 
-# 1. Run MongoDB database
+# Run MongoDB database
 mongod
 
-# 2. Run Server
+# Run Server
 npm run start-watch
 
-# 3. Run app
+# Run app
 npm run dev-server
